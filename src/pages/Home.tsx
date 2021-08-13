@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Alert } from "react-native";
 
 import { Header } from '../components/Header';
 import { MyTasksList } from '../components/MyTasksList';
@@ -15,8 +16,17 @@ export function Home() {
 
   function handleAddTask(newTaskTitle: string) {
     if (newTaskTitle) {
-      const task = { id: new Date().getTime(), title: newTaskTitle, done: false};
-      setTasks([...tasks, task]);
+      const taskAlreadyExists = tasks.find(task => task.title == newTaskTitle);
+
+      if (taskAlreadyExists !== undefined) {
+        Alert.alert(
+          "Task já cadastrada",
+          "Você não pode cadastrar uma task com o mesmo nome",
+        );
+      } else {
+        const task = { id: new Date().getTime(), title: newTaskTitle, done: false };
+        setTasks([...tasks, task]);
+      }
     }
   }
 
@@ -28,9 +38,32 @@ export function Home() {
     }
   }
 
+  function handleEditTask(taskId: number, taskNewTitle: string) {
+    const task = tasks.find(item => item.id === taskId);
+    if (task !== undefined) {
+      task.title = taskNewTitle;
+      setTasks([...tasks]);
+    }
+  }
+
   function handleRemoveTask(id: number) {
-    const newTasks = tasks.filter(x => x.id !== id);
-    setTasks([...newTasks]);
+    Alert.alert(
+      "Remover item",
+      "Tem certeza que você deseja remover esse item?",
+      [
+        {
+          text: "Não",
+          onPress: () => console.log("Cancel Pressed"),
+          style: "cancel"
+        },
+        {
+          text: "OK", onPress: (() => {
+            const newTasks = tasks.filter(x => x.id !== id);
+            setTasks([...newTasks]);
+          })
+        }
+      ]
+    );
   }
 
   return (
@@ -39,10 +72,11 @@ export function Home() {
 
       <TodoInput addTask={handleAddTask} />
 
-      <MyTasksList 
-        tasks={tasks} 
-        onPress={handleMarkTaskAsDone} 
-        onLongPress={handleRemoveTask} 
+      <MyTasksList
+        tasks={tasks}
+        editTask={handleEditTask}
+        onPress={handleMarkTaskAsDone}
+        onLongPress={handleRemoveTask}
       />
     </>
   )

@@ -15,11 +15,12 @@ interface MyTasksListProps {
     title: string;
     done: boolean;
   }[];
+  editTask: (id: number, newTaskTitle: string) => void;
   onPress: (id: number) => void;
   onLongPress: (id: number) => void;
 }
 
-export function MyTasksList({ tasks, onLongPress, onPress }: MyTasksListProps) {
+export function MyTasksList({ tasks, editTask, onLongPress, onPress }: MyTasksListProps) {
   return (
     <FlatList
       data={tasks}
@@ -33,11 +34,11 @@ export function MyTasksList({ tasks, onLongPress, onPress }: MyTasksListProps) {
             onPress={() => onPress(item.id)}
             onLongPress={() => onLongPress(item.id)}
           >
-            <View 
+            <View
               testID={`marker-${index}`}
               style={item.done ? styles.taskMarkerDone : styles.taskMarker}
             />
-            <Text 
+            <Text
               style={item.done ? styles.taskTextDone : styles.taskText}
             >
               {item.title}
